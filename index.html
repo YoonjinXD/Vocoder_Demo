@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+
+    
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect | Junwon Lee, Yoonjin Chung</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Junwon Lee, Yoonjin Chung" />
+<meta property="og:description" content="Junwon Lee, Yoonjin Chung" />
+<link rel="canonical" href="https://yoonjinxd.github.io/vocoder_demo/" />
+<meta property="og:url" content="https://yoonjinxd.github.io/vocoder_demo/" />
+<meta property="og:site_name" content="Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"Junwon Lee, Yoonjin Chung","headline":"Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect","name":"Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect","url":"https://yoonjinxd.github.io/vocoder_demo/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fff">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/vocoder_demo/assets/css/style.css?v=">
+    <link rel="stylesheet" href="/vocoder_demo/assets/css/custom.css?v=">
+    
+      <link rel="stylesheet" href="https://stylishthemes.github.io/Syntax-Themes/pygments/css-github/pygments-monokai.css">
+    
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Mimicking Vocal Tracks by Implementing and Applying Vocoder Effect</h1>
+      <h2 class="project-tagline"><a href="https://github.com/jnwnlee">Junwon Lee</a>, <a href="https://github.com/YoonjinXD">Yoonjin Chung</a></h2>
+      
+      
+        
+          <a href="https://github.com/YoonjinXD/vocoder_project" class="btn">View Project</a>
+        
+        
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Demo for the final project of <em><a href="https://mac.kaist.ac.kr/~juhan/gct535/index.html">GCT535 Spring 2022 Sound Technology for Multimedia, KAIST</a></em>.</p>
+
+<p>We constructed our own <strong>Vocoder Effect and related parameters to mimick several iconic vocoder-effected vocal tracks</strong> which are Daftpunk, Zedd and Stevie Wonder.</p>
+
+<ul>
+  <li>
+    <p>First, we implemented a classic channel vocoder using band-pass filters and RMS filters.</p>
+  </li>
+  <li>
+    <p>Second, we implemented and compared controllable parameters including F0, Number of Frequency Bands, Frequency Scale, Random Noising, Formant Shifting and Beta between modulator and carrier.
+We also implemented compressor and expander to improve the effector sound.</p>
+  </li>
+  <li>
+    <p>Finally, we mimicked the target artists using our implemented vocoder and its parameters.
+We also generated interesting results with various types of carrier sounds.</p>
+  </li>
+</ul>
+
+<p>You can check <a href="#vocoder-implementation">implementation detail</a> and <a href="#result-samples">result samples</a> below.</p>
+
+<h2 id="vocoder-implementation">Vocoder Implementation</h2>
+
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+
+<script type="text/javascript" id="MathJax-script" async="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script>
+
+<p><br /></p>
+
+<p>
+    <img src="public/images/vocoder.png" alt="" />
+    <em>Figure.1 Implementation of Vocoder</em>
+</p>
+
+<p><br /></p>
+
+<p>A vocoder takes two different signals, carrier $car$ and modulator $mod$, as inputs and outputs one result signal $output$. Let the number of frequency bands $N$, the number of time samples $T$.</p>
+
+<p>Each bandpass filter $bandpass_i, i\in [1, N]$ corresponding to a single frequency band has passband $[f_{i-1}, f_i]$.
+The output signal is retrieved as the following:</p>
+
+<p>\(output_t=ISTFT(\Sigma_{i\in [1, N]}{RMS(bandpass_i(mod_t))\times bandpass_i(STFT(car_t))}), t\in[0, T]\).</p>
+
+<p>RMS and STFT are calculated in the same hop length.</p>
+
+<p>As a result, we can retrieve a modified carrier signal that has the same envelope as the modulator signal in the frequency domain over time which reflects the formant characteristics of the modulator.</p>
+
+<p><br /></p>
+
+<p>
+    <img src="public/images/compare_stft.png" alt="" />
+    <em>Figure.2 Comparison between original STFT and vocoded STFT</em>
+</p>
+
+<p><br /></p>
+
+<h2 id="result-samples">Result Samples</h2>
+
+<table>
+    <tr>
+        <th>Modulator</th>
+        <th>Carrier</th>
+        <th>Vocoded Result</th>
+    </tr>
+    <tr>
+        <td rowspan="5"><audio src="public/audios/sources/wow.wav" controls=""></audio></td>
+        <td><audio src="public/audios/carriers/sawtooth.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/wow_basic.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td><audio src="public/audios/carriers/exp_sawtooth.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/wow_exp_sawtooth.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td><audio src="public/audios/carriers/orchestra.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/wow_orchestra.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td><audio src="public/audios/carriers/pad_chord.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/wow_pad_chord.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td><audio src="public/audios/carriers/wind.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/wow_wind.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="controllable-parameters">Controllable Parameters</h3>
+
+<ul class="tab" data-tab="1055a3b9-5318-48ad-a217-4f8edebb2a3d" data-name="parameters">
+  
+      <li class="active">
+          <a href="#">F0 </a>
+      </li>
+  
+      <li>
+          <a href="#">f Bands </a>
+      </li>
+  
+      <li>
+          <a href="#">Scale </a>
+      </li>
+  
+      <li>
+          <a href="#">Noise </a>
+      </li>
+  
+      <li>
+          <a href="#">Formant </a>
+      </li>
+  
+      <li>
+          <a href="#">Compressor </a>
+      </li>
+  
+      <li>
+          <a href="#">Expander </a>
+      </li>
+  
+      <li>
+          <a href="#">Beta </a>
+      </li>
+  
+</ul>
+<ul class="tab-content" id="1055a3b9-5318-48ad-a217-4f8edebb2a3d" data-name="parameters">
+  
+      <li class="active">
+<p>The <strong>fundamental frequency</strong>, often referred to simply as F0, is the lowest frequency of a periodic signal. In music, the pitch is the fundamental frequency of a note.
+Since the carrier sound is solely in charge of the harmonic, the result’s pitch is controlled by the F0 value of the carrier signal.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">f0=220</th>
+      <th style="text-align: center">f0=440</th>
+      <th style="text-align: center">f0=880</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/f0/suzanne_220.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/f0/suzanne_440.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/f0/suzanne_880.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p><strong>F Bands</strong> refers to the number of frequency bands into which the modulator signal is split.
+The larger number of F Bands means the smaller range of band-pass filters, vice versa.
+You can think of this number as a resolution of the modulator’s formant.
+Check the samples focusing on the formant(vowels) resolution.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">band_num=10</th>
+      <th style="text-align: center">band_num=60</th>
+      <th style="text-align: center">band_num=120</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/freq_band/suzanne_10.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/freq_band/suzanne_60.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/freq_band/suzanne_120.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p>Different <strong>Scales</strong>, such as linear or mel(log), can be applied on frequency axis when dividing equal-width Frequency Bands.
+It determines the range of each frequency band, which is important to human pitch perception and formant shift.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Linear Scale</th>
+      <th style="text-align: center">Mel Scale</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/freq_scale/suzanne_linear.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/freq_scale/suzanne_mel.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p>To highlight sibilant sounds (e.g. <em>s, sh, t, ch, chh</em>, etc.), high-frequency <strong>Noise</strong> can be added to the carrier signal.
+As these sounds do not have a particular pitch, adding frequency components around 8kHz to 16kHz may help them to stand out.<br />
+For implementation, we generated a random white noise and applied a bi-quad high-pass filter.
+<em>amp</em> is the amplitude of the noise. <em>Q</em> is the Q value of the bi-quad filter.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">without Noise</th>
+      <th style="text-align: center">amp=0.5, Q=1</th>
+      <th style="text-align: center">amp=0.7, Q=3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/noise/suzanne_basic.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/noise/suzanne_amp0.5_Q1.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/noise/suzanne_amp0.7_Q3.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p><strong>Formant-shifting</strong> is achieved by shifting the multiplication between the frequency band channels from modulator and carrier.
+If the shift step is 1, the modulator channel n would be mapped to the carrier channel n+1.
+Note that formant does not relate to the pitch or frequency of the signal, but rather the timbre and spectrum peaks.
+Each formant corresponds to a resonance in the vocal tract and is prominent in vowels.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">shift=0</th>
+      <th style="text-align: center">shift=-1</th>
+      <th style="text-align: center">shift=2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/formant_shift/suzanne_0.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/formant_shift/suzanne_-1.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/formant_shift/suzanne_2.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p><strong>Compressor</strong> attenuates the given sound above threshold (dB) with a certain ratio (&gt;1) while maintaining the maximum amplitude level (dB).
+It reduces the dynamic range without clipping.<br />
+Applying the effector before vocoder softens the dynamic change in formant.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">without Compressor</th>
+      <th style="text-align: center">with Compressor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/comp&amp;expd/suzanne_basic.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/comp&amp;expd/suzanne_comp.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p><strong>Expander</strong>, in contrast to compressor, attenuates the given sound below threshold (dB) with a certain ratio (&gt;1).
+It can reduce unnecessary noise.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">without Expander</th>
+      <th style="text-align: center">with Expander</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/comp&amp;expd/suzanne_basic.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/comp&amp;expd/suzanne_expd.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+      <li>
+<p><strong>Beta</strong> refers to the non-linear alternation of modulator signal as follows: ${modulator}^{beta} * carrier$
+This parameter was devised to control the artifact of modulator signal.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">ratio=0.3</th>
+      <th style="text-align: center">ratio=0.7</th>
+      <th style="text-align: center">ratio=1.2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><audio src="public/audios/results/beta/suzanne_0.3.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/beta/suzanne_0.7.wav" controls=""></audio></td>
+      <td style="text-align: center"><audio src="public/audios/results/beta/suzanne_1.2.wav" controls=""></audio></td>
+    </tr>
+  </tbody>
+</table>
+
+</li>
+  
+</ul>
+
+<p><br /></p>
+
+<hr />
+
+<h3 id="various-carrier-samples">Various Carrier Samples</h3>
+
+<p>We applied various types of carrier sounds to the two modulator, <em>suzanne</em> and <em>dog sound</em>.
+Check the below samples focusing on how the sound is modulated following the carrier’s texture or harmonic structure.</p>
+
+<h4 id="1-suzanne">1. Suzanne</h4>
+
+<audio src="public/audios/sources/suzanne.wav" controls=""></audio>
+
+<table>
+    <tr>
+        <th></th>
+        <th>Carrier</th>
+        <th>Vocoded Result</th>
+    </tr>
+    <tr>
+        <td>Incremental Sawtooth</td>
+        <td><audio src="public/audios/carriers/exp_sawtooth.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/suzanne_exp_sawtooth.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Orchestra</td>
+        <td><audio src="public/audios/carriers/orchestra.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/suzanne_orchestra.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Pad Chord</td>
+        <td><audio src="public/audios/carriers/pad_chord.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/suzanne_pad_chord.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Wind</td>
+        <td><audio src="public/audios/carriers/wind.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/suzanne_wind.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<h4 id="2-dog-sound">2. Dog Sound</h4>
+
+<audio src="public/audios/sources/dog_sound.wav" controls=""></audio>
+
+<table>
+    <tr>
+        <th></th>
+        <th>Carrier</th>
+        <th>Vocoded Result</th>
+    </tr>
+    <tr>
+        <td>Incremental Sawtooth</td>
+        <td><audio src="public/audios/carriers/exp_sawtooth.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_exp_sawtooth.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Harp</td>
+        <td><audio src="public/audios/carriers/harp.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_harp.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>School Bell</td>
+        <td><audio src="public/audios/carriers/school_bell.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_school_bell.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Synth</td>
+        <td><audio src="public/audios/carriers/synth.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_synth.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Whale</td>
+        <td><audio src="public/audios/carriers/whale.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_whale.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Meow</td>
+        <td><audio src="public/audios/carriers/meow.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_meow.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Starwars</td>
+        <td><audio src="public/audios/carriers/starwars.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_starwars.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Trumpet</td>
+        <td><audio src="public/audios/carriers/trumpet.wav" controls=""></audio></td>
+        <td><audio src="public/audios/results/carriers/dog_sound_trumpet.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<p><br /></p>
+
+<h2 id="lets-mimick-some-artists">Let’s Mimick Some Artists!</h2>
+
+<p>We used sawtooth signals with static or dynamic fundamental frequency over time as a carrier sound.
+By manipulating the controllable parameters of the vocoder, we finally got the resulting sound tracks.</p>
+
+<h4 id="1-daftpunk---harder-better-faster-stronger">1. Daftpunk - Harder, Better, Faster, Stronger</h4>
+
+<table>
+    <tr>
+        <td rowspan="3"><img src="public/images/daftpunk.jpeg" width="250px" /></td>
+        <td>Target</td>
+        <td><audio src="public/audios/results/artist/daftpunk.mp3" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Our Voice</td>
+        <td><audio src="public/audios/results/artist/daftpunk_vocal.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Mimicked Result</td>
+        <td><audio src="public/audios/results/artist/daftpunk_result+mr.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<h4 id="2-zedd---stay">2. Zedd - Stay</h4>
+
+<table>
+    <tr>
+        <td rowspan="3"><img src="public/images/zedd.jpg" width="250px" /></td>
+        <td>Target</td>
+        <td><audio src="public/audios/results/artist/zedd.mp3" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Our Voice</td>
+        <td><audio src="public/audios/results/artist/zedd_vocal.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Mimicked Result</td>
+        <td><audio src="public/audios/results/artist/zedd_result+mr.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<h4 id="3-stevie-wonder---close-to-you">3. Stevie Wonder - Close to you</h4>
+
+<table>
+    <tr>
+        <td rowspan="3"><img src="public/images/closetoyou.jpeg" width="250px" /></td>
+        <td>Target</td>
+        <td><audio src="public/audios/results/artist/Closetoyou.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Our Voice</td>
+        <td><audio src="public/audios/results/artist/Closetoyou_vocal.wav" controls=""></audio></td>
+    </tr>
+    <tr>
+        <td>Mimicked Result</td>
+        <td><audio src="public/audios/results/artist/Closetoyou_result+mr.wav" controls=""></audio></td>
+    </tr>
+</table>
+
+<p><br /></p>
+
+
+      <footer class="site-footer">
+        <span class="site-footer-credits">This page is maintained by Yoonjin Chung. <a href="https://github.com/YoonjinXD/vocoder_demo">View Page Repository.</a> </span>
+      </footer>
+    </main>
+
+    <script>
+      Array.from(
+        document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]')
+      ).forEach(h => {
+        h.addEventListener('click', e => {
+          window.location.hash = e.target.getAttribute('id');
+        });
+      })
+    </script>
+    <script src="/vocoder_demo/assets/js/tabs.js?v="></script>
+  </body>
+</html>
